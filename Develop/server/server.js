@@ -6,7 +6,6 @@ const { authMiddleware } = require('./utils/auth');
 
 const { typeDefs, resolvers } = require('./schemas');
 const db = require('./config/connection');
-const routes = require('./routes');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -29,12 +28,10 @@ const startApolloServer = async () => {
     app.use(express.static(path.join(__dirname, '../client/dist')));
 
     app.get('*', (req, res) => {
-      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+      res.sendFile(path.join(__dirname, '../client/dist/index.html'), { root: __dirname });
     });
   }
 
-  app.use(routes);
-  
   db.once('open', () => {
     app.listen(PORT, () => {
       console.log(`API server running on port ${PORT}`);
