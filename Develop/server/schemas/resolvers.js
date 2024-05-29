@@ -1,4 +1,4 @@
-const { saveBook } = require('../controllers/user-controller');
+//const { saveBook } = require('../controllers/user-controller');
 const { User } = require('../models');
 const { signToken, AuthenticationError } = require('../utils/auth');
 
@@ -6,16 +6,15 @@ const resolvers = {
 	Query: {
 		me: async (parent, args, context) => {
 			if (context.user) {
-				const userData = await User.findOne({ _id: context.user._id }).select(
-					'-__v -password'
-				);
-				return userData;
+				return User.findOne({ _id: context.user._id }).populate('savedBooks');
 			}
+			throw AuthenticationError
 		},
 	},
 
+
 	Mutation: {
-		addUser: async (parents, { username, email, password }) => {
+		addUser: async (parents, { username, email, password } ) => {
 			const user = await User.create({ username, email, password });
 			const token = signToken(user);
 			return { token, user };
@@ -39,12 +38,13 @@ const resolvers = {
 			return { token, user };
 		},
 
-		saveBook: async (parent, { book }, context) => {
+
+		saveBook: async (parent, { userId, bookData }, context) => {
 			if (context.user) {
 				return User.findOneAndUpdate(
-					{ _id: context.user._id },
+					{ _id: userId },
 					{
-						$addToSet: { savedBooks: book },
+						$addToSet: { savedBooks: [{ ...bookData }], },
 					},
 					{
 						new: true,
