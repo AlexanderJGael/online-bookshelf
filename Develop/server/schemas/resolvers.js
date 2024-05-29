@@ -38,6 +38,16 @@ const resolvers = {
 			return { token, user };
 		},
 
+		constructBook: async (parent, { bookData }, context) => {
+			if (context.user) {
+				return User.findOneAndUpdate(
+					{ _id: context.user._id },
+					{ $addToSet: { savedBooks: bookData } },
+					{ new: true, runValidators: true },
+				);
+			};
+			throw AuthenticationError;
+		},
 
 		saveBook: async (parent, { userId, bookData }, context) => {
 			if (context.user) {

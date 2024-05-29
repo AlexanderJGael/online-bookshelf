@@ -3,13 +3,6 @@ type Query {
     me: User
 }
 
-type Mutation {
-    addUser(username: String!, email: String!, password: String!): Auth
-    login(email: String!, password: String!): Auth
-    saveBook(userId: ID!, savedBooks: BookInput!): User
-    removeBook(userId: ID!, bookId: String!): User
-}
-
 type User {
     _id: ID
     username: String
@@ -42,6 +35,13 @@ input BookInput {
     link: String
 }
 
-`
+type Mutation {
+    addUser(username: String!, email: String!, password: String!): Auth
+    login(email: String!, password: String!): Auth
+    constructBook(bookData: BookInput): User
+    saveBook(userId: ID!, savedBooks: BookInput): User
+    removeBook(userId: ID!, bookId: String!): User
+}
+`;
 
 module.exports = typeDefs;
