@@ -38,29 +38,14 @@ const resolvers = {
 			return { token, user };
 		},
 
-		constructBook: async (parent, { bookData }, context) => {
+		saveBook: async (parent, { bookData }, context) => {
 			if (context.user) {
-				return User.findOneAndUpdate(
+				const updatedUser = await User.findOneAndUpdate(
 					{ _id: context.user._id },
 					{ $addToSet: { savedBooks: bookData } },
-					{ new: true, runValidators: true },
-				);
-			};
-			throw AuthenticationError;
-		},
-
-		saveBook: async (parent, { userId, bookData }, context) => {
-			if (context.user) {
-				return User.findOneAndUpdate(
-					{ _id: userId },
-					{
-						$addToSet: { savedBooks: [{ ...bookData }], },
-					},
-					{
-						new: true,
-						runValidators: true,
-					}
-				);
+					{ new: true, runValidators: true }
+				).populate('savedBooks');
+				return updatedUser;
 			}
 			throw AuthenticationError;
 		},
